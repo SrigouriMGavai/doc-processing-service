@@ -31,3 +31,14 @@ func (r *DocumentRepository) Create(ctx context.Context, title string) (*model.D
 	doc.ID = id
 	return doc, nil
 }
+func (r *DocumentRepository) GetByID(ctx context.Context, id string) (*model.Document, error) {
+	var doc model.Document
+
+	err := r.db.Get(ctx, id).ScanDoc(&doc)
+	if err != nil {
+		return nil, err
+	}
+
+	doc.ID = id
+	return &doc, nil
+}

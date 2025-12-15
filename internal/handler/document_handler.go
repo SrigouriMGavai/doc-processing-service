@@ -37,3 +37,22 @@ func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, doc)
 }
+func (h *DocumentHandler) GetDocumentByID(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "missing document id",
+		})
+		return
+	}
+
+	doc, err := h.repo.GetByID(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "document not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, doc)
+}

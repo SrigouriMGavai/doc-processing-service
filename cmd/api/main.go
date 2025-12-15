@@ -36,6 +36,8 @@ func main() {
 		})
 	})
 	r.POST("/documents", docHandler.CreateDocument)
+	r.GET("/documents/:id", docHandler.GetDocumentByID)
+
 	// Start HTTP server on port 8080
 	r.Run(":" + cfg.AppPort)
 
