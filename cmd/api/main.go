@@ -6,17 +6,25 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/config"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/db"
+	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/handler"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/middleware"
+	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/repository"
 )
 
 func main() {
 	// Create a Gin router
 	cfg := config.Load()
-	_, err := db.ConnectCouchDB()
+	couch, err := db.ConnectCouchDB()
+	//_, err := db.ConnectCouchDB()
+
 	if err != nil {
 		panic(err)
 	}
 	println("Connected to CouchDB")
+	docRepo := repository.NewDocumentRepository(couch.DB)
+	docHandler := handler.NewDocumentHandler(docRepo)
+
+	//println("Test document created with ID:", doc.ID)
 
 	r := gin.Default()
 	r.Use(middleware.RequestLogger())
@@ -27,7 +35,7 @@ func main() {
 			"status": "ok",
 		})
 	})
-
+	r.POST("/documents", docHandler.CreateDocument)
 	// Start HTTP server on port 8080
 	r.Run(":" + cfg.AppPort)
 
