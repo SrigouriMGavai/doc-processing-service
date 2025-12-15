@@ -5,12 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/config"
+	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/db"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/middleware"
 )
 
 func main() {
 	// Create a Gin router
 	cfg := config.Load()
+	_, err := db.ConnectCouchDB()
+	if err != nil {
+		panic(err)
+	}
+	println("Connected to CouchDB")
 
 	r := gin.Default()
 	r.Use(middleware.RequestLogger())
