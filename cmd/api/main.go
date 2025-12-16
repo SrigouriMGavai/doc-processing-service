@@ -22,14 +22,14 @@ func main() {
 		panic(err)
 	}
 	println("Connected to CouchDB")
-	_, err = cache.ConnectRedis()
+	redisClient, err := cache.ConnectRedis()
 	if err != nil {
 		panic(err)
 	}
 	println("Connected to Redis")
 
 	docRepo := repository.NewDocumentRepository(couch.DB)
-	docHandler := handler.NewDocumentHandler(docRepo)
+	docHandler := handler.NewDocumentHandler(docRepo, redisClient.Client)
 
 	//println("Test document created with ID:", doc.ID)
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-kivik/couchdb/v3"
 	"github.com/go-kivik/kivik/v3"
-	_ "github.com/go-kivik/couchdb/v3"
 )
 
 type CouchDB struct {
@@ -14,19 +14,21 @@ type CouchDB struct {
 }
 
 func ConnectCouchDB() (*CouchDB, error) {
-	// CouchDB connection URL
-	couchURL := "http://admin:admin@127.0.0.1:5984/"
+	ctx := context.Background()
 
-	// Create client
-	client, err := kivik.New("couch", couchURL)
+	// Create CouchDB client
+	client, err := kivik.New("couch", "http://127.0.0.1:5984/")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create couchdb client: %w", err)
 	}
 
-	// Connect to database
-	db := client.DB(context.Background(), "documents")
+	// ✅ CORRECT authentication for kivik v3
+	if err := client.Authenticate(ctx, couchdb.BasicAuth("admin", "admin")); err != nil {
+		return nil, fmt.Errorf("couchdb authentication failed: %w", err)
+	}
 
-	// Check if DB exists
+	// Connect to database
+	db := client.DB(ctx, "documents")
 	if err := db.Err(); err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
