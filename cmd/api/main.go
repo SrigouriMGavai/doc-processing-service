@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/cache"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/config"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/db"
 	"gitlab.com/srigourimgavai-group/doc-processing-service/internal/handler"
@@ -21,6 +22,12 @@ func main() {
 		panic(err)
 	}
 	println("Connected to CouchDB")
+	_, err = cache.ConnectRedis()
+	if err != nil {
+		panic(err)
+	}
+	println("Connected to Redis")
+
 	docRepo := repository.NewDocumentRepository(couch.DB)
 	docHandler := handler.NewDocumentHandler(docRepo)
 
